@@ -5,7 +5,6 @@ when its prompts are perturbed.
 
 ## Data
 
-
 The base prompts open-ended generation questions.  You can edit `data/prompts.json` or replace it with your own prompts.
 
 ## Directory structure
@@ -95,8 +94,11 @@ variant structure:
 You can store responses directly inside `data/variants.json` or pass them via
 a separate file (`--responses-file`).
 
-## Step 3 – Embed responses and compute cosine similarity
+## Step 3 – Calculate metrics & visualizations
 
+### Embed responses and compute cosine similarity
+
+If only the cosine similarity metric is desired, you can skip the LLM-as-a-judge step and run:
 ```bash
 python scripts/embed_and_score.py \
     --variants       data/variants.json \
@@ -108,25 +110,45 @@ python scripts/embed_and_score.py \
 Each response is embedded with a
 [sentence-transformers](https://www.sbert.net/) model.  The cosine similarity
 between the **base** response embedding and each **variant** response embedding
-is then computed and written to `results/similarity_scores.json` and
-`results/similarity_scores.csv`.
+is then computed and written to `results/embedding_scores.json`.
 
 A similarity score close to **1.0** indicates the model's response is nearly
 identical regardless of the perturbation; a lower score indicates persona drift.
 
-### Output format (`results/similarity_scores.json`)
+### LLM-as-a-judge
+
+Each variant response is also compared to the base response using an LLM-as-a-judge (here `llama-3.1:8b` as well due to local compute constraints). The 
+judge is asked to rate the personality drift of the variant from the base response on a scale from 1 to 10. 
+
+The query is retried if the judge fails to provide a valid rating a maximum of 3 times. A rating closer to 1 indicates very little drift between the base response and variant response for a given persona. A rating closer to 10 indicates significant drift.
+### Output format (`results/<embedding|judge>_scores.json`)
 
 ```json
 [
   {
     "id": "p001",
     "scores": {
-      "noise":       0.9812,
-      "adversarial": 0.7341,
-      "emotional":   0.8654,
-      "jailbreak":   0.6923,
-      "irrelevant":  0.9501
+      "<persona_1>_noise":       0.9812,
+      "<persona_1>_adversarial": 0.7341,
+      "<persona_1>_emotional":   0.8654,
+      "<persona_1>_jailbreak":   0.6923,
+      "<persona_1>_irrelevant":  0.9501, 
+      "<persona_2>_noise": ...,
     }
   }
 ]
 ```
+
+### Visualizations
+Finally, a heatmap can be generated to compare the similarity scores across personas and perturbation methods. This functionality is included by defaults
+in the evaluation pipeline script, which can be run as follows:
+
+```bash
+python ./scripts/run_evaluation_pipeline.py --variants data/variants.json --responses-file data/responses.json --out-dir results
+```
+
+## Results for simple prompts
+
+Here are the heatmaps for the similarity scores of a 3B parameter LLaMA-3.1 model on a set of simple prompts (e.g. "What is the capital of France?"):
+![Heatmap of similarity scores across perturbation methods and personas](results/embedding_heatmap.png)
+![Heatmap of judge scores across perturbation methods and personas](results/judge_heatmap.png)
