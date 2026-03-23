@@ -1,7 +1,12 @@
-# persona-stability
+# Model Persona Drift from Prompt Perturbations
 
 A lightweight pipeline for measuring how much a language model's persona drifts
 when its prompts are perturbed.
+
+## Data
+
+
+The base prompts open-ended generation questions.  You can edit `data/prompts.json` or replace it with your own prompts.
 
 ## Directory structure
 
@@ -22,7 +27,10 @@ persona-stability/
 ## Requirements
 
 ```
-pip install sentence-transformers numpy
+pip install ollama
+pip install sentence-transformers
+pip install numpy pandas matplotlib
+pip install tqdm
 ```
 
 ## Step 1 – Generate prompt variants
