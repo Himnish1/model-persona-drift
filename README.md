@@ -149,7 +149,7 @@ python ./scripts/run_evaluation_pipeline.py --variants data/variants.json --resp
 
 ## Results for simple prompts
 
-Here are the heatmaps for the similarity and judge scores of a 8B parameter LLaMA-3.1 model on a set of simple prompts (e.g. "What is the capital of France?"):
+Here are the heatmaps for the similarity (higher / brighter -> less drift) and judge (lower / darker-> less drift) scores of a 8B parameter LLaMA-3.1 model on a set of simple prompts (e.g. "What is the capital of France?"):
 
 ![Heatmap of similarity scores across perturbation methods and personas](results/embedding_heatmap.png)
 ![Heatmap of judge scores across perturbation methods and personas](results/judge_heatmap.png)
