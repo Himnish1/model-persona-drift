@@ -119,7 +119,7 @@ def _amplify_emotion_with_ollama(text: str) -> str:
                 },
                 {"role": "user", "content": text},
             ],
-            options={"temperature": 1.0},
+            options={"temperature": 0.0},
         )
 
         # Support both object-style and dict-style response access
